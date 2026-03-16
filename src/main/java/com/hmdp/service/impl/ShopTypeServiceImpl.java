@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -30,6 +31,9 @@ public class ShopTypeServiceImpl extends ServiceImpl<ShopTypeMapper, ShopType> i
 
     @Resource
     private StringRedisTemplate stringRedisTemplate;
+
+    // 1~5分钟随机
+    private int randomTtl = ThreadLocalRandom.current().nextInt(1, 6);
 
     @Override
     public List<ShopType> typeList() {
@@ -54,7 +58,7 @@ public class ShopTypeServiceImpl extends ServiceImpl<ShopTypeMapper, ShopType> i
                 .collect(Collectors.toList());
         // 写入redis
         stringRedisTemplate.opsForList().rightPushAll(key, typeListString);
-        stringRedisTemplate.expire(key, RedisConstants.CACHE_SHOP_TTL, TimeUnit.MINUTES);
+        stringRedisTemplate.expire(key, RedisConstants.CACHE_SHOP_TTL + randomTtl, TimeUnit.MINUTES);
         return typeList;
     }
 }

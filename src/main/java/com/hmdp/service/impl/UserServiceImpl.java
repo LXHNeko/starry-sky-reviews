@@ -21,6 +21,7 @@ import javax.servlet.http.HttpSession;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
 import static com.hmdp.utils.RedisConstants.*;
@@ -40,7 +41,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
     @Resource
     private StringRedisTemplate stringRedisTemplate;
-
 
     @Override
     public Result sendCode(String phone, HttpSession session) {
