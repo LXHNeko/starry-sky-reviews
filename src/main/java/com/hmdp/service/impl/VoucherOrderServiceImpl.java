@@ -56,6 +56,19 @@ public class VoucherOrderServiceImpl extends ServiceImpl<VoucherOrderMapper, Vou
             return Result.fail("库存不足");
         }
 
+        // 一人一单
+        Long userId = UserHolder.getUser().getId();
+        // 查询订单
+        int count = query()
+                .eq("user_id", userId)
+                .eq("voucher_id", voucherId)
+                .count();
+        // 判断是否存在
+        if(count > 0){
+            // 用户已经购买过了
+            return Result.fail("用户已经购买过一次！");
+        }
+
         // 扣减库存
         boolean success = seckillVoucherService.update()
                 .setSql("stock = stock - 1")
@@ -74,7 +87,6 @@ public class VoucherOrderServiceImpl extends ServiceImpl<VoucherOrderMapper, Vou
         long orderId = redisIdWorker.nextId("order");
         voucherOrder.setId(orderId);
         // 用户id
-        Long userId = UserHolder.getUser().getId();
         voucherOrder.setUserId(userId);
         // 代金券id
         voucherOrder.setVoucherId(voucherId);
